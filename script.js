@@ -6,7 +6,7 @@ let ffmpeg = null;
 async function initFFmpeg() {
     if (ffmpeg?.loaded) return;
     ffmpeg = new FFmpeg();
-    const workerURL = new URL('/node_modules/@ffmpeg/ffmpeg/dist/esm/worker.js', window.location.origin).href;
+    const workerURL = new URL('/ffmpeg/worker.js', window.location.origin).href;
     await ffmpeg.load({ classWorkerURL: workerURL });
 }
 

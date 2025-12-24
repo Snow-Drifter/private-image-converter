@@ -2,13 +2,11 @@ package main
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
 	e := echo.New()
 
-	e.Use(middleware.AddTrailingSlash())
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			c.Response().Header().Set("Cross-Origin-Opener-Policy", "same-origin")
@@ -21,7 +19,10 @@ func main() {
 		return c.File("index.html")
 	})
 
-	e.Static("/", ".")
+	e.Static("/ffmpeg", "node_modules/@ffmpeg/ffmpeg/dist/esm")
+	e.Static("/ffmpeg-util", "node_modules/@ffmpeg/util/dist/esm")
+	e.File("/style.css", "style.css")
+	e.File("/script.js", "script.js")
 
 	port := ":3000"
 	e.Logger.Info("Server running on http://localhost" + port)
