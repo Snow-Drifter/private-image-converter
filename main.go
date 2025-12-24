@@ -15,14 +15,9 @@ func main() {
 		}
 	})
 
-	e.GET("/", func(c echo.Context) error {
-		return c.File("index.html")
-	})
-
 	e.Static("/ffmpeg", "node_modules/@ffmpeg/ffmpeg/dist/esm")
 	e.Static("/ffmpeg-util", "node_modules/@ffmpeg/util/dist/esm")
-	e.File("/style.css", "style.css")
-	e.File("/script.js", "script.js")
+	e.Static("/", "public")
 
 	port := ":3000"
 	e.Logger.Info("Server running on http://localhost" + port)
