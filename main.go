@@ -5,19 +5,20 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+func crossOriginHeaders(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		c.Response().Header().Set("Cross-Origin-Opener-Policy", "same-origin")
+		c.Response().Header().Set("Cross-Origin-Embedder-Policy", "credentialless")
+		return next(c)
+	}
+}
+
 func main() {
 	e := echo.New()
 
 	e.Use(middleware.Secure())
 	e.Use(middleware.CORS())
-
-	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			c.Response().Header().Set("Cross-Origin-Opener-Policy", "same-origin")
-			c.Response().Header().Set("Cross-Origin-Embedder-Policy", "credentialless")
-			return next(c)
-		}
-	})
+	e.Use(crossOriginHeaders)
 
 	e.Static("/ffmpeg", "node_modules/@ffmpeg/ffmpeg/dist/esm")
 	e.Static("/ffmpeg-util", "node_modules/@ffmpeg/util/dist/esm")

@@ -60,6 +60,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const imageInput = document.getElementById('image');
     const preview = document.getElementById('preview');
     const uploadText = document.querySelector('.upload-text');
+    const uploadArea = document.querySelector('.upload-area');
     
     imageInput.addEventListener('change', () => {
         const file = imageInput.files[0];
@@ -73,6 +74,17 @@ window.addEventListener('DOMContentLoaded', () => {
             reader.readAsDataURL(file);
         }
         updateButton();
+    });
+    
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        if (e.dataTransfer.files[0]?.type.startsWith('image/')) {
+            imageInput.files = e.dataTransfer.files;
+            imageInput.dispatchEvent(new Event('change'));
+        }
     });
     
     document.getElementById('filename').addEventListener('input', updateButton);
