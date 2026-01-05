@@ -2,6 +2,7 @@ import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile } from '@ffmpeg/util';
 
 let ffmpeg = null;
+let isConverting = false;
 
 async function initFFmpeg() {
     if (ffmpeg?.loaded) return;
@@ -13,7 +14,7 @@ async function initFFmpeg() {
 function updateButton() {
     const file = document.getElementById('image').files[0];
     const btn = document.getElementById('convertBtn');
-    btn.disabled = !file || !ffmpeg?.loaded;
+    btn.disabled = !file || isConverting;
 }
 
 async function handleConvert(event) {
@@ -24,10 +25,23 @@ async function handleConvert(event) {
     const extensionInput = document.getElementById('extension');
     const filename = filenameInput.value.trim() || filenameInput.placeholder;
     const extension = extensionInput.value.trim() || extensionInput.placeholder;
+    const errorMessage = document.getElementById('error-message');
     
     if (!file) return;
     
-    await initFFmpeg();
+    // Check if FFmpeg is still loading
+    if (!ffmpeg?.loaded) {
+        errorMessage.textContent = 'Conversion engine is still loading. Please wait.';
+        errorMessage.classList.add('warning');
+        errorMessage.style.display = 'block';
+        return;
+    }
+    
+    // Disable button during conversion
+    isConverting = true;
+    updateButton();
+    errorMessage.classList.remove('warning');
+    errorMessage.style.display = 'none';
     
     // FFmpeg uses 'jpg' internally
     const format = extension.toLowerCase().replace('jpeg', 'jpg');
@@ -36,9 +50,6 @@ async function handleConvert(event) {
     const inputExt = file.name.split('.').pop() || 'bin';
     const inputName = `input.${inputExt}`;
     const outputName = `output.${format}`;
-    
-    const errorMessage = document.getElementById('error-message');
-    errorMessage.style.display = 'none';
     
     try {
         await ffmpeg.writeFile(inputName, await fetchFile(file));
@@ -64,6 +75,8 @@ async function handleConvert(event) {
         errorMessage.style.display = 'block';
     } finally {
         try { await ffmpeg.deleteFile(inputName); } catch {}
+        isConverting = false;
+        updateButton();
     }
 }
 

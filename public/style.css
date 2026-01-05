@@ -166,11 +166,18 @@ button:disabled {
 }
 
 .error-message {
-    padding: 1rem;
+    padding: 0.75rem;
     background: #3a1f1f;
     border: 1px solid #5a2f2f;
     color: #ff6b6b;
     border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.error-message.warning {
+    background: #3a351f;
+    border-color: #5a4f2f;
+    color: #e0c040;
 }
 
 /* Landscape on small screens or wider viewports: side by side */
