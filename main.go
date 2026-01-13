@@ -1,6 +1,8 @@
 package main
 
 import (
+	"private_image_converter/security"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -16,6 +18,8 @@ func sharedArrayBufferHeaders(next echo.HandlerFunc) echo.HandlerFunc {
 func main() {
 	e := echo.New()
 
+	e.Pre(middleware.WWWRedirect())
+
 	e.Use(middleware.Secure())
 	e.Use(middleware.CORS())
 	e.Use(sharedArrayBufferHeaders)
@@ -24,7 +28,10 @@ func main() {
 	e.Static("/ffmpeg-util", "node_modules/@ffmpeg/util/dist/esm")
 	e.Static("/", "public")
 
-	port := ":3000"
-	e.Logger.Info("Server running on http://localhost" + port)
-	e.Logger.Fatal(e.Start(port))
+	tlsManager := security.NewManager(security.DefaultConfig())
+	httpServer, httpsServer := tlsManager.SetupServers(e)
+
+	if err := tlsManager.StartServers(httpServer, httpsServer); err != nil {
+		e.Logger.Fatal(err)
+	}
 }
